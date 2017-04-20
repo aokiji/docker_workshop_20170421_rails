@@ -1,0 +1,19 @@
+version: '2'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app:Z
+    links:
+      - db
+  db:
+    image: postgres:9.5
+    env_file: .env
+    volumes:
+      - wsdbdata:/var/lib/postgresql/data
+volumes:
+  wsdbdata:
