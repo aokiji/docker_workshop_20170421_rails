@@ -4,16 +4,33 @@ services:
     build:
       context: .
       dockerfile: server.Dockerfile
+    environment:
+      JOB_WORKER_URL: "redis://redis:6379/0"
     ports:
       - 3000:3000
     volumes:
       - .:/usr/src/app:Z
     links:
       - db
+      - redis
   db:
     image: postgres:9.5
     env_file: .env
     volumes:
       - wsdbdata:/var/lib/postgresql/data
+  redis:
+    image: redis
+  sidekiq:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    environment:
+      JOB_WORKER_URL: "redis://redis:6379/0"
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    links:
+      - db
+      - redis
+    volumes:
+      - .:/usr/src/app:Z
 volumes:
   wsdbdata:
